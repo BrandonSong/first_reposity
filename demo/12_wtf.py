@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, EqualTo
@@ -24,9 +24,21 @@ def index():
     return "index page"
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
+    if request.method == "GET":
+        return render_template("register.html", form=form)
+    else:
+        # 判断form中的数据是否合理
+        # 如果form中的数据完全满足所有的验证器,则返回真,否则返回假
+        if form.validate_on_submit():
+            # 提取数据
+            user_name = form.user_name.data
+            password = form.password.data
+            password2 = form.password2.data
+        else:
+            render_template("register.html", form=form)
 
 
 if __name__ == '__main__':

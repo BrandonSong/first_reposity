@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{# 不带参数的宏 #}
+    {% macro input()%}
+        <input type="text" value="" size="30">
+    {% endmacro %}
+
+{# 带参数的宏 #}
+    {% macro input2(type, value, size) %}
+        <input type="{{ type }}" value="{{ value }}" size="{{ size }}">
+    {% endmacro %}
+
+<h1>input macro</h1>
+{{ input() }}
+
+<h1>input2</h1>
+{{ input2("password", "", 50) }}
+
+{# 外部引入 #}
+{% import "macro.html" as func %}
+{% func.input() %}
+
+
+</body>
+</html>
