@@ -31,9 +31,37 @@
             <ul>
                 {%  for book in author.books %}
                   <li>书籍:{{ book.name }}</li>
+                    <a href="javascript:;" book-id="{{ book.id }}" onclick="deleteBook();">删除</a>
                 {% endfor %}
             </ul>
         {% endfor %}
     </ul>
 </body>
+
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        $("a").click(
+        function deleteBook() {
+            var data = {
+                book_id: $(this).attr("book-id")
+            };
+
+            // 将js对象转换为json字符串
+            var req_json = JSON.stringify(data);
+            
+            $.ajax({
+                url: "/delete_book",
+                data: req_json,
+                type: "post",
+                contentType: "application/json", //指明发送的数据格式
+                dataType: "json", // 指明后端返回的数据格式
+                success: function (resp) {
+                    if(resp.code == 0){
+                        location.href = "/"
+                    }
+                }
+            })
+        })
+    </script>
+
 </html>

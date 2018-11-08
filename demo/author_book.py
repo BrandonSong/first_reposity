@@ -1,9 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+import json
 
 pymysql.install_as_MySQLdb()
 
@@ -53,7 +54,7 @@ class AuthorBookForm(FlaskForm):
     submit = SubmitField(label="保存")
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     # 创建表单对象
     form = AuthorBookForm()
@@ -64,11 +65,33 @@ def index():
         book_name = form.book_name.data
 
         # 保存数据
-        Author(name=author_name)
+        author = Author(name=author_name)
+        db.session.add(author)
+        db.session.commit()
+
+        book = Book(name=book_name, author_id=author.id)
+        db.session.add(book)
+        db.session.commit()
 
     # 查询数据库
     authors = Author.query.all()  # 作者列表
     return render_template("authors_book.html", authors=authors, form=form)
+
+
+@app.route("/delete_book", methods=["POST"])
+def delete_book():
+    """删除书籍"""
+    # 提取json格式参数，get_json会将参数解析成字典类型
+    # 前端传入的content-type必须为application/json
+    req_data = request.get_json()
+    book_id = req_data.get("book_id")
+
+    # 删除数据
+    book = Book.query.get(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    # return redirect(url_for("index"))
+    return jsonify(code=0, message="OK")
 
 
 if __name__ == '__main__':
